@@ -1626,34 +1626,37 @@ void Character::Recoil()
 	// EvgAnat - recoil energy cost -->
 	VDATA *res = nullptr;
 	res = core.Event("ChrCheckEnergy", "is", GetId(), "recoil");
-    if (res)
-    {
-        int32_t isEnable = 1;
-        if (res->Get(isEnable))
+	if(res)
+	{
+		int32_t isEnable = 1;
+		if (res->Get(isEnable))
         {
-            if (!isEnable)
-            {
-                res = nullptr;
-            }
-        }
-        else
-        {
-            res = nullptr;
-        }
-    }
-	if (res)
-    {
-		
-        fgtSetType = fgt_recoil;
+			if(isEnable)
+			{
+				fgtSetType = fgt_recoil;
+				fgtSetIndex = 0;
+				recoilWait = 0.8f;
+				isTurnLock = false;
+			}
+			else
+			{
+				fgtSetType = fgt_none;
+				fgtSetIndex = -1;
+			}
+		}
+		else
+		{
+			fgtSetType = fgt_none;
+			fgtSetIndex = -1;
+		}
+	}
+	else
+	{
+		fgtSetType = fgt_recoil;
 		fgtSetIndex = 0;
 		recoilWait = 0.8f;
 		isTurnLock = false;
-    }
-    else
-    {
-        fgtSetType = fgt_none;
-        fgtSetIndex = -1;
-    }
+	}
 	// EvgAnat - recoil energy cost <--
 }
 
@@ -1671,33 +1674,37 @@ void Character::StrafeLeft()
     // EvgAnat - strafe left energy cost -->
 	VDATA *res = nullptr;
 	res = core.Event("ChrCheckEnergy", "is", GetId(), "strafe_l");
-    if (res)
-    {
-        int32_t isEnable = 1;
-        if (res->Get(isEnable))
+	if(res)
+	{
+		int32_t isEnable = 1;
+		if (res->Get(isEnable))
         {
-            if (!isEnable)
-            {
-                res = nullptr;
-            }
-        }
-        else
-        {
-            res = nullptr;
-        }
-    }
-	if (res)
-    {
-        strafeWait = 0.8f;
+			if(isEnable)
+			{
+				fgtSetType = fgt_strafe_l;
+				fgtSetIndex = 0;
+				strafeWait = 0.8f;
+				isTurnLock = false;
+			}
+			else
+			{
+				fgtSetType = fgt_none;
+				fgtSetIndex = -1;
+			}
+		}
+		else
+		{
+			fgtSetType = fgt_none;
+			fgtSetIndex = -1;
+		}
+	}
+	else
+	{
 		fgtSetType = fgt_strafe_l;
 		fgtSetIndex = 0;
+		strafeWait = 0.8f;
 		isTurnLock = false;
-    }
-    else
-    {
-        fgtSetType = fgt_none;
-        fgtSetIndex = -1;
-    }
+	}
 	// EvgAnat - strafe left energy cost <--
 
     // impulse += 15.0f*CVECTOR(-cosf(ay), 0.0f, sinf(ay))
@@ -1717,33 +1724,37 @@ void Character::StrafeRight()
     // EvgAnat - strafe right energy cost -->
 	VDATA *res = nullptr;
 	res = core.Event("ChrCheckEnergy", "is", GetId(), "strafe_r");
-    if (res)
-    {
-        int32_t isEnable = 1;
-        if (res->Get(isEnable))
+	if(res)
+	{
+		int32_t isEnable = 1;
+		if (res->Get(isEnable))
         {
-            if (!isEnable)
-            {
-                res = nullptr;
-            }
-        }
-        else
-        {
-            res = nullptr;
-        }
-    }
-	if (res)
-    {
-        strafeWait = 0.8f;
+			if(isEnable)
+			{
+				fgtSetType = fgt_strafe_r;
+				fgtSetIndex = 0;
+				strafeWait = 0.8f;
+				isTurnLock = false;
+			}
+			else
+			{
+				fgtSetType = fgt_none;
+				fgtSetIndex = -1;
+			}
+		}
+		else
+		{
+			fgtSetType = fgt_none;
+			fgtSetIndex = -1;
+		}
+	}
+	else
+	{
 		fgtSetType = fgt_strafe_r;
 		fgtSetIndex = 0;
+		strafeWait = 0.8f;
 		isTurnLock = false;
-    }
-    else
-    {
-        fgtSetType = fgt_none;
-        fgtSetIndex = -1;
-    }
+	}
 	// EvgAnat - strafe right energy cost <--
 	
     // impulse -= 15.0f*CVECTOR(-cosf(ay), 0.0f, sinf(ay));
@@ -2950,16 +2961,24 @@ if(storm::iEquals(eventName, "Blade to belt"))
 						// EvgAnat - new script event for missing chance -->
 						resHit = 1;
 						VDATA *vd = core.Event("Check_ChrHitFire", "iilf", GetId(), enemy, static_cast<int32_t>(chr->isRecoilState), kDist);
-						if (vd && vd->Get(resHit))
+						if(vd)
 						{
-							if (resHit == 2)
+							if(vd->Get(resHit))
 							{
-								core.Event("Location_CharacterFire", "iifl", GetId(), enemy, kDist, 1);
-								chr->Hit(fgt_hit_fire);
+								if(resHit == 2)
+								{
+									core.Event("Location_CharacterFire", "iifl", GetId(), enemy, kDist, 1);
+									chr->Hit(fgt_hit_fire);
+								}
 							}
-						}					
-                    }
-					if (resHit <= 1)
+						}
+						else
+						{
+							core.Event("Location_CharacterFire", "iifl", GetId(), enemy, kDist, 1);
+							chr->Hit(fgt_hit_fire);
+						}
+					}
+					else
 					{
 						core.Event("Location_CharacterFire", "iifl", GetId(), enemy, kDist, 0);
 					}
@@ -4604,7 +4623,7 @@ void Character::UpdateAnimation()
                 case fgt_strafe_l: // Bounce to the left
                     core.Send_Message(blade, "ll", MSG_BLADE_TRACE_OFF, 0);
                     recoilSound = SOUND_INVALID_ID; // PlaySound("recoil", true);
-                    impulse += 15.0f * CVECTOR(-cosf(ay), 0.0f, sinf(ay));
+                    impulse += 10.0f * CVECTOR(-cosf(ay), 0.0f, sinf(ay));
                     if (!(isSet = SetAction(strafe_l.name, strafe_l.tblend, 0.0f, 0.0f)))
                     {
                         core.Trace("Character animation: not set recoil action: \"%s\"", strafe_l.name);
@@ -4613,7 +4632,7 @@ void Character::UpdateAnimation()
                 case fgt_strafe_r: // Bounce to the left
                     core.Send_Message(blade, "ll", MSG_BLADE_TRACE_OFF, 0);
                     recoilSound = SOUND_INVALID_ID; // PlaySound("recoil", true);
-                    impulse -= 15.0f * CVECTOR(-cosf(ay), 0.0f, sinf(ay));
+                    impulse -= 10.0f * CVECTOR(-cosf(ay), 0.0f, sinf(ay));
                     if (!(isSet = SetAction(strafe_r.name, strafe_r.tblend, 0.0f, 0.0f)))
                     {
                         core.Trace("Character animation: not set recoil action: \"%s\"", strafe_l.name);
